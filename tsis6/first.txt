@@ -1,0 +1,6 @@
+.idea
+ahahahah.txt
+files1.py
+first.txt
+practice.py
+venv
