@@ -1,8 +1,7 @@
 import pygame
 pygame.init()
 
-screen = pygame.display.set_mode((900, 700))
-
+screen = pygame.display.set_mode((800, 800))
 
 def round_line(canvas, color, start, end, radius=1) :
     x_axis = end[0] - start[0]
