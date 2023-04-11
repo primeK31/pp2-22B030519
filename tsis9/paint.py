@@ -6,6 +6,9 @@ WIDTH, HEIGHT = 800, 800
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 BLACK = pygame.Color(0, 0, 0)
 WHITE = pygame.Color(255, 255, 255)
+RED = pygame.Color(255, 0, 0)
+GREEN = pygame.Color(0, 255, 0)
+BLUE = pygame.Color(0, 0, 255)
 
 
 class GameObject:
@@ -17,19 +20,21 @@ class GameObject:
 
 
 class Button:  # если ты фигуру изволишь изменить - то унаследуй (pygame.sprite.Sprite)
-    def __init__(self):
+    def __init__(self, x, y):
         # super().__init__() и вот это раскомментируй
+        self.x = x
+        self.y = y
         self.rect = pygame.draw.rect(
             SCREEN,
             WHITE,
-            (WIDTH // 2 - 20, 20, 40, 40)
+            (self.x, self.y, 40, 40)
         )
 
     def draw(self):
         self.rect = pygame.draw.rect(
             SCREEN,
             WHITE,
-            (WIDTH // 2, 20, 40, 40)
+            (self.x, self.y, 40, 40)
         )
 
 
@@ -52,9 +57,10 @@ class Pen(GameObject):
 
 
 class Rectangle(GameObject):
-    def __init__(self, start_pos):
+    def __init__(self, ch_color, start_pos):
         self.start_pos = start_pos
         self.end_pos = start_pos
+        self.ch_color = ch_color
 
     def draw(self):
         start_pos_x = min(self.start_pos[0], self.end_pos[0])
@@ -65,7 +71,7 @@ class Rectangle(GameObject):
 
         pygame.draw.rect(
             SCREEN,
-            WHITE,
+            self.ch_color,
             (
                 start_pos_x,
                 start_pos_y,
@@ -214,12 +220,15 @@ class Square(GameObject):
 def main():
     running = True
     active_obj = None
-    button = Button()
+    button = Button(20, 20)
+    buttonRect = Button(70, 20)
     objects = [
-        button
+        button,
+        buttonRect,
     ]
     clock = pygame.time.Clock()
     current_shape = 'pen'
+    ch_color = WHITE
 
     while running:
         SCREEN.fill(BLACK)
@@ -227,14 +236,28 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_g:
+                    ch_color = GREEN
+                if event.key == pygame.K_r:
+                    ch_color = RED
+                if event.key == pygame.K_b:
+                    ch_color = BLUE
+                if event.key == pygame.K_w:
+                    ch_color = WHITE
+                if event.key == pygame.K_e:
+                    ch_color = BLACK
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'rectangle'
+                if buttonRect.rect.collidepoint(pygame.mouse.get_pos()):
+                    current_shape = 'eqRect'
                 else:
                     if current_shape == 'pen':
                         active_obj = Pen(start_pos=event.pos)
                     elif current_shape == 'rectangle':
+                        active_obj = Rectangle(ch_color, start_pos=event.pos)
+                    elif current_shape == 'eqRect':
                         active_obj = equilateralTriangle(start_pos=event.pos)
 
             if event.type == pygame.MOUSEMOTION and active_obj is not None:

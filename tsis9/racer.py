@@ -55,7 +55,7 @@ class Coin(pygame.sprite.Sprite):
     def update(self):
         self.rect.center = (random.randint(30, WIDTH - 30), HEIGHT - 60)
 
-class jewCoin(pygame.sprite.Sprite):
+class jCoin(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load('./materials/jew_coins.png')
@@ -99,7 +99,7 @@ def main():
     enemies = pygame.sprite.Group()
     enemies.add(enemy)
     cn = Coin()
-    jew_coin = jewCoin()
+    jew_coin = jCoin()
     jew_coins = pygame.sprite.Group()
     jew_coins.add(jew_coin)
     coin = pygame.sprite.Group()
@@ -131,12 +131,11 @@ def main():
         if pygame.sprite.spritecollideany(player, coin):
             coins += 1
             if coins % 5 == 0:
-                enemy.speed += 5
+                enemy.speed += 1
             print(enemy.speed)
             coin.update()
         if pygame.sprite.spritecollideany(player, jew_coins):
             coins += 5
-            enemy.speed += 5
             print(enemy.speed)
             jew_coins.update()
 

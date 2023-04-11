@@ -190,6 +190,10 @@ def main():
             snake.body.append(Point(snake.body[-1].x, snake.body[-1].y))
             food.location.x = random.randint(0, WIDTH // BLOCK_SIZE - 1)
             food.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
+            while food.location in snake.body:
+                if food.location not in snake.body:
+                    food.location.x = random.randint(0, WIDTH // BLOCK_SIZE - 1)
+                    food.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
             score += 1
             if score % 5 == 0:
                 fps += 2
