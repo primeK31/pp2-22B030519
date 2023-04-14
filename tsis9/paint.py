@@ -222,9 +222,17 @@ def main():
     active_obj = None
     button = Button(20, 20)
     buttonRect = Button(70, 20)
+    buttonTr = Button(120, 20)
+    buttonR = Button(170, 20)
+    buttonS = Button(220, 20)
+    buttonC = Button(270, 20)
     objects = [
         button,
         buttonRect,
+        buttonTr,
+        buttonR,
+        buttonS,
+        buttonC,
     ]
     clock = pygame.time.Clock()
     current_shape = 'pen'
@@ -246,12 +254,21 @@ def main():
                 if event.key == pygame.K_w:
                     ch_color = WHITE
                 if event.key == pygame.K_e:
-                    ch_color = BLACK
+                    if objects:
+                        objects.pop()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'rectangle'
                 if buttonRect.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'eqRect'
+                if buttonTr.rect.collidepoint(pygame.mouse.get_pos()):
+                    current_shape = 'Trngl'
+                if buttonR.rect.collidepoint(pygame.mouse.get_pos()):
+                    current_shape = 'Romb'
+                if buttonS.rect.collidepoint(pygame.mouse.get_pos()):
+                    current_shape = 'Square'
+                if buttonC.rect.collidepoint(pygame.mouse.get_pos()):
+                    current_shape = 'Circle'
                 else:
                     if current_shape == 'pen':
                         active_obj = Pen(start_pos=event.pos)
@@ -259,6 +276,14 @@ def main():
                         active_obj = Rectangle(ch_color, start_pos=event.pos)
                     elif current_shape == 'eqRect':
                         active_obj = equilateralTriangle(start_pos=event.pos)
+                    elif current_shape == 'Trngl':
+                        active_obj = rightTriangle(start_pos=event.pos)
+                    elif current_shape == 'Romb':
+                        active_obj = Romb(start_pos=event.pos)
+                    elif current_shape == 'Square':
+                        active_obj = Square(start_pos=event.pos)
+                    elif current_shape == 'Circle':
+                        active_obj = Circle(start_pos=event.pos)
 
             if event.type == pygame.MOUSEMOTION and active_obj is not None:
                 # active_obj.points.append(pygame.mouse.get_pos())
