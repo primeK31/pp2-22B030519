@@ -1,5 +1,4 @@
 import pygame
-import math
 
 pygame.init()
 WIDTH, HEIGHT = 800, 800
@@ -44,7 +43,7 @@ class Pen(GameObject):
         self.ch_color = ch_color
 
     def draw(self):
-        for idx, point in enumerate(self.points[:-1]):
+        for idx, point in enumerate(self.points[:-1]): # рисуем множество точек через линии(идем до n-1)
             pygame.draw.line(
                 SCREEN,
                 self.ch_color,
@@ -64,11 +63,11 @@ class Rectangle(GameObject):
         self.ch_color = ch_color
 
     def draw(self):
-        start_pos_x = min(self.start_pos[0], self.end_pos[0])
+        start_pos_x = min(self.start_pos[0], self.end_pos[0]) # стартовая позиция мыщи
         start_pos_y = min(self.start_pos[1], self.end_pos[1])
 
-        end_pos_x = max(self.start_pos[0], self.end_pos[0])
-        end_pos_y = max(self.start_pos[1], self.end_pos[1])
+        end_pos_x = max(self.start_pos[0], self.end_pos[0]) # конечная позиция мыши
+        end_pos_y = max(self.start_pos[1], self.end_pos[1]) # в остальных объектах все += похожее
 
         pygame.draw.rect(
             SCREEN,
@@ -220,7 +219,10 @@ class Square(GameObject):
 
 def main():
     running = True
-    active_obj = None
+    active_obj = None # переменная в которой мы будем хранит объект
+    # этот объект прорисовывает текущую фигуру(когда мы зажимаем мышку и двигаем ее(пока мышь не опустили),
+    # этот объект рисуется в проге)
+    # создаю 8 кнопок
     button = Button(20, 20)
     buttonRect = Button(70, 20)
     buttonTr = Button(120, 20)
@@ -229,7 +231,7 @@ def main():
     buttonC = Button(270, 20)
     buttonP = Button(320, 20)
     buttonE = Button(370, 20)
-    objects = [
+    objects = [ # массив объектов(тут кнопки и фигуры, которые мы будем рисовать
         button,
         buttonRect,
         buttonTr,
@@ -240,7 +242,7 @@ def main():
         buttonE,
     ]
     clock = pygame.time.Clock()
-    current_shape = 'pen'
+    current_shape = 'pen' # текущий инструмент - карандаш
     ch_color = WHITE
 
     while running:
@@ -260,12 +262,13 @@ def main():
                     ch_color = WHITE
                 if event.key == pygame.K_e: # при нажатии на клавишу E, удаляются объекты из массива objects(кнпоки тоже)
                     if objects:
-                        objects.pop() # удаление последнего элемента
+                        objects.pop() # удаление последнего элемента (типа ctrl + Z)
+                # чтобы кнопки не удалялись, можно попробовать запихнуть в отдельный массив и прорисовать
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if button.rect.collidepoint(pygame.mouse.get_pos()):
+                if button.rect.collidepoint(pygame.mouse.get_pos()): # если я нажимаю на эту кнопку текущий инструмент - прямоугольник
                     current_shape = 'rectangle'
                     ch_color = WHITE
-                if buttonRect.rect.collidepoint(pygame.mouse.get_pos()):
+                if buttonRect.rect.collidepoint(pygame.mouse.get_pos()): # то же самое в других
                     current_shape = 'eqRect'
                 if buttonTr.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'Trngl'
@@ -283,6 +286,7 @@ def main():
                     ch_color = (0, 0, 0)
                 else:
                     if current_shape == 'pen':
+                        # значение start_pos равна позиции когда мы только нажали на мышь(MOUSEBUTTONDOWN)
                         active_obj = Pen(ch_color, start_pos=event.pos)
                     elif current_shape == 'eraser':
                         active_obj = Pen(ch_color, start_pos=event.pos)
@@ -300,16 +304,15 @@ def main():
                         active_obj = Circle(start_pos=event.pos)
 
             if event.type == pygame.MOUSEMOTION and active_obj is not None:
-                # active_obj.points.append(pygame.mouse.get_pos())
-                active_obj.handle(mouse_pos=pygame.mouse.get_pos())
-                # active_obj.points => raise
+                active_obj.handle(mouse_pos=pygame.mouse.get_pos()) # тут мы присваиваем end_pos(через mouse_pos)
+                # MOUSEMOTION то есть движение мыши, end_pos activeObj равен позиции где мышь мы пока держим
                 active_obj.draw()
 
             if event.type == pygame.MOUSEBUTTONUP and active_obj is not None:
-                objects.append(active_obj)
+                objects.append(active_obj) # когда мы опустим мышь мы добавляем готовый объект в objects
                 active_obj = None
 
-        for obj in objects:
+        for obj in objects: # рисуем все объекты
             obj.draw()
 
         clock.tick(30)
@@ -318,3 +321,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
