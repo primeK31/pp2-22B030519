@@ -39,14 +39,15 @@ class Button:  # если ты фигуру изволишь изменить - 
 
 
 class Pen(GameObject):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ch_color, *args, **kwargs):
         self.points = []  # [(x1, y1), (x2, y2)]
+        self.ch_color = ch_color
 
     def draw(self):
         for idx, point in enumerate(self.points[:-1]):
             pygame.draw.line(
                 SCREEN,
-                WHITE,
+                self.ch_color,
                 start_pos=point,  # self.points[idx]
                 end_pos=self.points[idx + 1],
                 width=5,
@@ -226,6 +227,8 @@ def main():
     buttonR = Button(170, 20)
     buttonS = Button(220, 20)
     buttonC = Button(270, 20)
+    buttonP = Button(320, 20)
+    buttonE = Button(370, 20)
     objects = [
         button,
         buttonRect,
@@ -233,6 +236,8 @@ def main():
         buttonR,
         buttonS,
         buttonC,
+        buttonP,
+        buttonE,
     ]
     clock = pygame.time.Clock()
     current_shape = 'pen'
@@ -245,7 +250,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_g:
+                if event.key == pygame.K_g: # меняется цвет для карандаша и прямоугольника на зеленый
                     ch_color = GREEN
                 if event.key == pygame.K_r:
                     ch_color = RED
@@ -253,9 +258,9 @@ def main():
                     ch_color = BLUE
                 if event.key == pygame.K_w:
                     ch_color = WHITE
-                if event.key == pygame.K_e:
+                if event.key == pygame.K_e: # при нажатии на клавишу E, удаляются объекты из массива objects(кнпоки тоже)
                     if objects:
-                        objects.pop()
+                        objects.pop() # удаление последнего элемента
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'rectangle'
@@ -269,9 +274,16 @@ def main():
                     current_shape = 'Square'
                 if buttonC.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'Circle'
+                if buttonP.rect.collidepoint(pygame.mouse.get_pos()):
+                    current_shape = 'pen'
+                if buttonE.rect.collidepoint(pygame.mouse.get_pos()):
+                    current_shape = 'eraser'
+                    ch_color = (0, 0, 0)
                 else:
                     if current_shape == 'pen':
-                        active_obj = Pen(start_pos=event.pos)
+                        active_obj = Pen(ch_color, start_pos=event.pos)
+                    elif current_shape == 'eraser':
+                        active_obj = Pen(ch_color, start_pos=event.pos)
                     elif current_shape == 'rectangle':
                         active_obj = Rectangle(ch_color, start_pos=event.pos)
                     elif current_shape == 'eqRect':
