@@ -264,6 +264,7 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'rectangle'
+                    ch_color = WHITE
                 if buttonRect.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'eqRect'
                 if buttonTr.rect.collidepoint(pygame.mouse.get_pos()):
@@ -276,6 +277,7 @@ def main():
                     current_shape = 'Circle'
                 if buttonP.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'pen'
+                    ch_color = WHITE
                 if buttonE.rect.collidepoint(pygame.mouse.get_pos()):
                     current_shape = 'eraser'
                     ch_color = (0, 0, 0)
