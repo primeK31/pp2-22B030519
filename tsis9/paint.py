@@ -230,7 +230,7 @@ def main():
     buttonC = Button(270, 20)
     buttonP = Button(320, 20)
     buttonE = Button(370, 20)
-    objects = [ # массив объектов(тут кнопки и фигуры, которые мы будем рисовать
+    buttonss = [ # массив объектов(тут кнопки и фигуры, которые мы будем рисовать
         button,
         buttonRect,
         buttonTr,
@@ -240,6 +240,7 @@ def main():
         buttonP,
         buttonE,
     ]
+    objects = []
     clock = pygame.time.Clock()
     current_shape = 'pen' # текущий инструмент - карандаш
     ch_color = WHITE
@@ -311,6 +312,8 @@ def main():
                 objects.append(active_obj) # когда мы опустим мышь мы добавляем готовый объект в objects
                 active_obj = None
 
+        for buton in buttonss:
+            buton.draw()
         for obj in objects: # рисуем все объекты
             obj.draw()
 
