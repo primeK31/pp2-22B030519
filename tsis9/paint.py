@@ -123,13 +123,13 @@ class equilateralTriangle(GameObject): # triangle triangle triangle
 
         end_pos_x = max(self.start_pos[0], self.end_pos[0])
         end_pos_y = max(self.start_pos[1], self.end_pos[1])
-        rad = end_pos_x - start_pos_x
+        rad = max(end_pos_x - start_pos_x, end_pos_y - start_pos_y)
         pygame.draw.polygon(
             SCREEN, WHITE,
             (
                 (start_pos_x, start_pos_y),
-                (start_pos_x - rad // (3 ** .5 * 2), start_pos_y + rad // 2),
-                (start_pos_x + rad // (3 ** .5 * 2), start_pos_y + rad // 2),
+                (start_pos_x - rad // 2, start_pos_y + rad * (3 ** .5) // 2),
+                (start_pos_x + rad // 2, start_pos_y + rad * (3 ** .5) // 2),
             ),
             width=5
         )
@@ -172,7 +172,6 @@ class Romb(GameObject):
 
         end_pos_x = max(self.start_pos[0], self.end_pos[0])
         end_pos_y = max(self.start_pos[1], self.end_pos[1])
-
         pygame.draw.polygon(
             SCREEN,
             WHITE,
@@ -321,4 +320,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
