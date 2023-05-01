@@ -155,7 +155,7 @@ def main():
     cur = conn.cursor()
     is_user = False
     user_name = input("Enter name: ")
-    query = """SELECT user_name, user_score from snake order by user_name"""
+    query = """SELECT user_name, user_score FROM user1 INNER JOIN user2 on user1.id = user2.id;"""
     cur.execute(query)
     row = cur.fetchall()
     for i in row:
@@ -205,9 +205,12 @@ def main():
                                     WHERE user_name = %s"""
                         cur.execute(update, (score, user_name))
                     else:
-                        add_user = """INSERT into snake (user_name, user_score)
-                                        VALUES (%s, %s);"""
-                        cur.execute(add_user, (user_name, score,))
+                        add_user = """INSERT into user1 (user_name)
+                                                VALUES (%s);"""
+                        add_score = """INSERT INTO user2 (user_score)
+                                                VALUES (%s);"""
+                        cur.execute(add_user, (user_name,))
+                        cur.execute(add_score, (score,))
                     conn.commit()
                 if event.key == pygame.K_r:
                     clock.tick(fps)
@@ -269,14 +272,17 @@ def main():
         pygame.display.flip()
         clock.tick(fps)
     if is_user:
-        update = """ UPDATE snake
+        update = """ UPDATE user1 INNER JOIN user2 on user1.id = user2.id
                     SET user_score = %s
                     WHERE user_name = %s"""
-        cur.execute(update, (score, user_name))
+        cur.execute(update, (str(score), user_name))
     else:
-        add_user = """INSERT into snake (user_name, user_score)
-                        VALUES (%s, %s);"""
-        cur.execute(add_user, (user_name, score,))
+        add_user = """INSERT into user1 (user_name)
+                        VALUES (%s);"""
+        add_score = """INSERT INTO user2 (user_score)
+                        VALUES (%s);"""
+        cur.execute(add_user, (user_name,))
+        cur.execute(add_score, (str(score),))
     conn.commit()
 
     cur.close()
