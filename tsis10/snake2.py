@@ -43,14 +43,15 @@ class Point:
 class Snake:
     def __init__(self):
         self.body = [
-            Point(
-                x=WIDTH // BLOCK_SIZE // 2,
-                y=HEIGHT // BLOCK_SIZE // 2,
-            ),
+        Point(
+            x=WIDTH // BLOCK_SIZE // 2,
+            y=HEIGHT // BLOCK_SIZE // 2,
+        ),
             #Point(
             #    x=WIDTH // BLOCK_SIZE // 2 + 1,
             #    y=HEIGHT // BLOCK_SIZE // 2,),
-       ]
+        ]
+
 
     def draw(self):
         head = self.body[0]
@@ -67,6 +68,7 @@ class Snake:
                             body.y * BLOCK_SIZE,
                             BLOCK_SIZE, BLOCK_SIZE)
             )
+
 
     def move(self, dx, dy):
         for idx in range(len(self.body) - 1, 0, -1):
@@ -131,6 +133,7 @@ class Wall:
     def __init__(self, x, y):
         self.location = Point(x, y)
 
+
     def draw(self):
         for i in range(0, HEIGHT, BLOCK_SIZE):
             for j in range(0, WIDTH, BLOCK_SIZE):
@@ -162,14 +165,26 @@ def main():
         if i[0] == user_name:
             score = i[1]
             is_user = True
-    running = True
     snake = Snake()
+    row3 = list()
+    if is_user:
+        query3 = """SELECT x, y, user_name FROM user3"""
+        cur.execute(query3)
+        row3 = cur.fetchall()
+        snake.body.pop()
+        for i in row3[:]:
+            if user_name == i[2]:
+                snake.body.append(Point(i[0], i[1]))
+    running = True
     food = Food(5, 5)
     fps = 5
     level = 1
     score_font = pygame.font.SysFont("Verdana", 30)
     dx, dy = 0, 0
     isDown = False
+    isLeft = False
+    isRight = False
+    isUp = False
     pygame.time.set_timer(pygame.USEREVENT, 1000)
     counter = 0
     isDraw = True
@@ -177,6 +192,7 @@ def main():
     superFood = SuperFood(1, 1)
     pause_button = Button(50, 50)
     resume_button = Button(100, 50)
+    is_ready = False
 
     while running:
         SCREEN.fill(WHITE)
@@ -195,12 +211,20 @@ def main():
                     superFood.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
                 print(counter)
             if event.type == pygame.QUIT:
+                if is_user:
+                    delete_xy = """DELETE FROM user3 WHERE user_name = %s"""
+                    cur.execute(delete_xy, (user_name,))
+                for i in snake.body:  # INNER JOIN user1 on user1.id = user3.id
+                    insert_xy = """INSERT INTO user3(x, y, user_name) 
+                                    VALUES(%s, %s, %s);"""
+                    cur.execute(insert_xy, (i.x, i.y, user_name,))
                 running = False
             if event.type == pygame.KEYDOWN:
+                is_ready = True
                 if event.key == pygame.K_e:
                     clock.tick(0)
                     if is_user:
-                        update = """ UPDATE snake
+                        update = """UPDATE snake
                                     SET user_score = %s
                                     WHERE user_name = %s"""
                         cur.execute(update, (score, user_name))
@@ -239,8 +263,9 @@ def main():
                     isRight = False
                     isLeft = True
 
-        snake.move(dx, dy)
-        if snake.check_wall():
+        if is_ready:
+            snake.move(dx, dy)
+        if snake.check_wall() and is_ready:
             running = False
         if snake.check_collision(food):
             snake.body.append(Point(snake.body[-1].x, snake.body[-1].y))
@@ -272,17 +297,17 @@ def main():
         pygame.display.flip()
         clock.tick(fps)
     if is_user:
-        update = """ UPDATE user1 INNER JOIN user2 on user1.id = user2.id
-                    SET user_score = %s
-                    WHERE user_name = %s"""
-        cur.execute(update, (str(score), user_name))
+        update = """ UPDATE user2
+                    SET user_score = %s FROM user1
+                    WHERE user1.id = user2.id"""
+        cur.execute(update, (score,))
     else:
         add_user = """INSERT into user1 (user_name)
                         VALUES (%s);"""
         add_score = """INSERT INTO user2 (user_score)
                         VALUES (%s);"""
         cur.execute(add_user, (user_name,))
-        cur.execute(add_score, (str(score),))
+        cur.execute(add_score, (score,))
     conn.commit()
 
     cur.close()
