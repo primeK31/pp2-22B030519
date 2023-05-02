@@ -21,9 +21,11 @@ query = """SELECT user_name, phone from list order by user_name"""
 delete_user = """DELETE from list where user_name = %s"""
 
 cur.execute(add_user, (name, phone, ))
-cur.execute(query)
-row = cur.fetchall()
-print(row)
+cur.execute("""COPY list(user_name, phone) FROM 'D://python_labs//pp2-22B030519//tsis10//Book (1).csv'
+               DELIMITER ',' CSV HEADER;""")
+#  cur.execute(query)
+#  row = cur.fetchall()
+#  print(row)
 conn.commit()
 
 cur.close()

@@ -130,20 +130,22 @@ class SuperFood(Food):
 
 
 class Wall:
-    def __init__(self, x, y):
-        self.location = Point(x, y)
+    def __init__(self):
+        self.body = list()
+        for i in range(0, 20):
+            for j in range(0, 20):
+                if i == 0 or j == 0:
+                    self.body.append(Point(i, j))
 
 
     def draw(self):
-        for i in range(0, HEIGHT, BLOCK_SIZE):
-            for j in range(0, WIDTH, BLOCK_SIZE):
-                if i == 0 or j == 0 or i == HEIGHT - BLOCK_SIZE or j == WIDTH - BLOCK_SIZE:
-                    pygame.draw.rect(SCREEN, BLACK,
-                                     pygame.Rect(
-                                         i,
-                                         j,
-                                         BLOCK_SIZE, BLOCK_SIZE,
-                                     ))
+        for i in self.body:
+            pygame.draw.rect(SCREEN, GREEN,
+                         pygame.Rect(
+                             i.x * BLOCK_SIZE,
+                             i.y * BLOCK_SIZE,
+                             BLOCK_SIZE, BLOCK_SIZE,
+                         ))
 
 
 def main():
@@ -157,6 +159,7 @@ def main():
 
     cur = conn.cursor()
     is_user = False
+    is_user_save = False
     user_name = input("Enter name: ")
     query = """SELECT user_name, user_score FROM user1 INNER JOIN user2 on user1.id = user2.id;"""
     cur.execute(query)
@@ -165,9 +168,16 @@ def main():
         if i[0] == user_name:
             score = i[1]
             is_user = True
+    query3 = """SELECT user_name FROM user3;"""
+    cur.execute(query3)
+    row4 = cur.fetchall()
+    for i in row4:
+        if i[0] == user_name:
+            is_user_save = True
     snake = Snake()
+    wall = Wall()
     row3 = list()
-    if is_user:
+    if is_user and is_user_save:
         query3 = """SELECT x, y, user_name FROM user3"""
         cur.execute(query3)
         row3 = cur.fetchall()
@@ -193,6 +203,8 @@ def main():
     pause_button = Button(50, 50)
     resume_button = Button(100, 50)
     is_ready = False
+    if score >= 5:
+        level = 2
 
     while running:
         SCREEN.fill(WHITE)
@@ -222,22 +234,20 @@ def main():
             if event.type == pygame.KEYDOWN:
                 is_ready = True
                 if event.key == pygame.K_e:
-                    clock.tick(0)
+                    is_ready = False
                     if is_user:
-                        update = """UPDATE snake
-                                    SET user_score = %s
-                                    WHERE user_name = %s"""
+                        update = """ UPDATE user2
+                                    SET user_score = %s FROM user1
+                                    WHERE user1.id = user2.id and user1.user_name = %s"""
                         cur.execute(update, (score, user_name))
                     else:
                         add_user = """INSERT into user1 (user_name)
-                                                VALUES (%s);"""
+                                        VALUES (%s);"""
                         add_score = """INSERT INTO user2 (user_score)
-                                                VALUES (%s);"""
+                                        VALUES (%s);"""
                         cur.execute(add_user, (user_name,))
                         cur.execute(add_score, (score,))
-                    conn.commit()
-                if event.key == pygame.K_r:
-                    clock.tick(fps)
+                        is_user = True
                 if event.key == pygame.K_UP and not isDown:
                     isUp = True
                     isDown = False
@@ -269,12 +279,11 @@ def main():
             running = False
         if snake.check_collision(food):
             snake.body.append(Point(snake.body[-1].x, snake.body[-1].y))
-            food.location.x = random.randint(0, WIDTH // BLOCK_SIZE - 1)
-            food.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
-            while food.location in snake.body:
-                if food.location not in snake.body:
-                    food.location.x = random.randint(0, WIDTH // BLOCK_SIZE - 1)
-                    food.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
+            food.location.x = random.randint(1, WIDTH // BLOCK_SIZE - 1)
+            food.location.y = random.randint(1, HEIGHT // BLOCK_SIZE - 1)
+            if food.location in snake.body:
+                food.location.x = random.randint(1, WIDTH // BLOCK_SIZE - 1)
+                food.location.y = random.randint(1, HEIGHT // BLOCK_SIZE - 1)
             score += 1
             if score % 5 == 0:
                 fps += 2
@@ -287,8 +296,13 @@ def main():
                 isDraw = False
                 is_drawn = False
                 score += 6
+        for i in wall.body:
+            if snake.body[0].x == i.x and snake.body[0].y == i.y:
+                running = False
         snake.draw()
         food.draw()
+        if level > 1:
+            wall.draw()
         pause_button.draw()
         resume_button.draw()
         draw_grid()
@@ -299,8 +313,8 @@ def main():
     if is_user:
         update = """ UPDATE user2
                     SET user_score = %s FROM user1
-                    WHERE user1.id = user2.id"""
-        cur.execute(update, (score,))
+                    WHERE user1.id = user2.id and user1.user_name = %s"""
+        cur.execute(update, (score, user_name))
     else:
         add_user = """INSERT into user1 (user_name)
                         VALUES (%s);"""
