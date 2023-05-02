@@ -9,6 +9,15 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 
+def info():  # 1
+    word = input("Enter word: ")
+    word += '%'
+    cur.execute("SELECT * from get_info(%s);", (word,))  # 1
+    row = cur.fetchall()
+    print(row)
+    conn.commit()
+
+
 def update(name, number):  # 2
     check_user = ("SELECT 1 FROM list WHERE user_name = '%s'" % (name,))
     cur.execute(check_user)
@@ -20,17 +29,17 @@ def update(name, number):  # 2
     conn.commit()
 
 
+def offset():  # 4
+    cur.execute("SELECT * from list order by id limit 3 offset 2;")
+    row = cur.fetchall()
+    print(row)
+
+
 def delete(name):  # 5
     cur.execute('CALL delete_user(%s)', (name,))
     conn.commit()
 
 
-number = input("Enter number: ")
-cur.callproc("get_info", (number,))  # 1
-row = cur.fetchall()
-print(row)
-cur.execute("SELECT * from list order by id limit 3 offset 2;")  # 4
-cur.execute("CALL get_many()",)  # 3
-
+conn.commit()
 cur.close()
 conn.close()
