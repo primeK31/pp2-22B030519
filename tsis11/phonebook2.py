@@ -29,10 +29,14 @@ def update(name, number):  # 2
     conn.commit()
 
 
-def many1():
+def many1():   # 3
     l = [['Lolter', '+77018260248'], ['Kyle', '+9213890484'], ['Bot', '21930344'], ['Proos', '23847853']]
     for i in l:
         cur.execute("CALL insert_user(%s, %s)", (i[0], i[1],))
+    cur.execute("select * from many3();")
+    cur.execute("select * from list2;")
+    row = cur.fetchall()
+    print(row)
 
 
 
