@@ -16,7 +16,7 @@ update = """ UPDATE list
                 SET phone = %s
                 WHERE id = %s"""
 
-query = """SELECT user_name, phone from list order by user_name"""
+query = """SELECT user_name, phone from list where user_name = %s"""
 
 delete_user = """DELETE from list where user_name = %s"""
 

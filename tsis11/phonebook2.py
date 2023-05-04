@@ -29,8 +29,15 @@ def update(name, number):  # 2
     conn.commit()
 
 
+def many1():
+    l = [['Lolter', '+77018260248'], ['Kyle', '+9213890484'], ['Bot', '21930344'], ['Proos', '23847853']]
+    for i in l:
+        cur.execute("CALL insert_user(%s, %s)", (i[0], i[1],))
+
+
+
 def offset():  # 4
-    cur.execute("SELECT * from list order by id limit 3 offset 2;")
+    cur.execute("select * from get_info1();")
     row = cur.fetchall()
     print(row)
 
@@ -39,7 +46,7 @@ def delete(name):  # 5
     cur.execute('CALL delete_user(%s)', (name,))
     conn.commit()
 
-
+many1()
 conn.commit()
 cur.close()
 conn.close()
